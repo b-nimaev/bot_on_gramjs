@@ -28,7 +28,6 @@ const stringSession = new StringSession("1AgAOMTQ5LjE1NC4xNjcuNTEBu4m2CbdgWNxNMB
 
     async function eventPrint(event: NewMessageEvent) {
         const message = event.message;
-        console.log(await message.getSender())
         // Checks if it's a private message (from user or bot)
         if (event.isPrivate) {
             // read message
@@ -37,8 +36,32 @@ const stringSession = new StringSession("1AgAOMTQ5LjE1NC4xNjcuNTEBu4m2CbdgWNxNMB
 
                 // @ts-ignore
                 if (sender.username == 'SmartTablesTemplatesBot') {
+                    let msg = message.message.split('\n')
+                    let result = ''
+                    msg.forEach((element, index) => {
+                        if (index !== 2) {
+                            result += element + '\n'
+                        }
+                    });
+                    console.log(result)
                     await client.sendMessage(channel, {
-                        message: `${message.message}`
+                        message: `${result}`
+                    })
+                }
+
+                // @ts-ignore
+                if (sender.username == 'waefawfbot') {
+
+                    let msg = message.message.split('\n')
+                    let result = ''
+                    msg.forEach((element, index) => {
+                        if (index !== 2) {
+                            result += element + '\n'
+                        }
+                    });
+                    console.log(result)
+                    await client.sendMessage(channel, {
+                        message: `${result}`
                     })
                 }
             }
