@@ -1,0 +1,18 @@
+{
+  "name": "gramjs",
+  "version": "1.0.0",
+  "description": "Freelance project on gram.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "anastasia parfenova",
+  "license": "ISC",
+  "dependencies": {
+    "input": "^1.0.1",
+    "telegram": "^2.10.10"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.14"
+  }
+}
