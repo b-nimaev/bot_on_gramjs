@@ -1,19 +1,27 @@
 import { TelegramClient } from "telegram";
+const os = require("os")
+const pkg = require("./package.json")
 import { Api } from "telegram/tl";
 import { StringSession } from "telegram/sessions";
 import { NewMessage, NewMessageEvent } from "telegram/events/NewMessage";
 import * as input from "input"; // npm i input
 
-const apiId = 16409256;
-const apiHash = "b5b24897de7945d47a511cf85c5b6487";
-const stringSession = new StringSession("1AgAOMTQ5LjE1NC4xNjcuNTEBu4m2CbdgWNxNMBkAj5+6858LiCwDDDWJtOEsfYsk+vXYagJO0LJp94M2GWg3tQUCcwfOYXoRrHajsW4IMqh0FHXNbh7KL0pbP2NVU8OlfW/dwqTvLPW8trX99l/mMsKhQD/UXhI8Zb0WhO4m8yinE1Hl8shIf94uRqB1zC6AZO1CfccY9bQUcSZoLiWsIr/tj92csX5uGWiB3kdPKuCynrgMOUSmbrqwAJYKq5xwMMerHTasNeCUDnlrcexg7GZzQ+3zK5WI3Qa/gIyYHmWwOUAd2MAcD7svUNRsh90uPgs3WXWN0MH1NsmXA6d61IrY7lsFdSmj4D1jQ/fcff8D3CI="); // fill this later with the value from session.save()
+const apiId = 29577119;
+const apiHash = "db2bbdfa5d628b8ed65a929f441af9b0";
+const stringSession = new StringSession("1AgAOMTQ5LjE1NC4xNjcuNTABu5dtuoty6br9Y3I99nwF8ZMCv7WnhiqE261ornBVbfa++p6XjLv21ew8yjnqmKGycN6j73AzzOpVbib+3ZoGfJ5vGLkTzEu2D0LqY12PbnSZ/0O9lu/ttkGIbCPxNnaOZNTWsMh1Bon8ALlETVdjyKIGi599IeUjlk8NNlp8QFhsRTNAYN0etFVoVvqo3ueXPAPmYu2SeEGj0JCCQvsQOnCaYGGrPg4GEC5tW1XeU62XHoz9mwLwooQ6PPKjhW6Ol3npc+o0jFnKMeg8IG8iMaqHvCzKhlrUHx6O9oRjbTmZk3eI8K8bHk+bLc3X4b0zxDJWlSl+FDbCpqhLGvdtX44="); // fill this later with the value from session.save()
 
 (async () => {
     console.log("Loading interactive example...");
 
     const client = new TelegramClient(stringSession, apiId, apiHash, {
         connectionRetries: 5,
+        deviceModel: `${pkg.name}@${os.hostname()}`,
+        systemVersion: os.version() || "Unknown node",
+        appVersion: pkg.version,
+        useWSS: true,
+        testServers: false,
     });
+    console.log(os.hostname())
 
     await client.start({
         phoneNumber: async () => await input.text("Please enter your number: "),
@@ -24,48 +32,70 @@ const stringSession = new StringSession("1AgAOMTQ5LjE1NC4xNjcuNTEBu4m2CbdgWNxNMB
     });
 
     console.log(client.session.save()); // Save this string to avoid logging in again
-    let channel = -1001737667504
+    // let channel = -1001737667504
 
     async function eventPrint(event: NewMessageEvent) {
+
+
         const message = event.message;
-        // Checks if it's a private message (from user or bot)
-        if (event.isPrivate) {
-            // read message
-            if (message) {
-                const sender = await message.getSender();
+        let sender = await message.getSender()
 
-                // @ts-ignore
-                if (sender.username == 'SmartTablesTemplatesBot') {
-                    let msg = message.message.split('\n')
-                    let result = ''
-                    msg.forEach((element, index) => {
-                        if (index !== 2) {
-                            result += element + '\n'
-                        }
-                    });
-                    console.log(result)
-                    await client.sendMessage(channel, {
-                        message: `${result}`
-                    })
-                }
+        // 853773971 айди бота
+        // 1272270574 мой айди
+        // 990629674 айди группы куда нужно скидывать
 
-                // @ts-ignore
-                if (sender.username == 'waefawfbot') {
+        if (sender.id.valueOf() === 853773971) {
 
-                    let msg = message.message.split('\n')
-                    let result = ''
-                    msg.forEach((element, index) => {
-                        if (index !== 2) {
-                            result += element + '\n'
-                        }
-                    });
-                    console.log(result)
-                    await client.sendMessage(channel, {
-                        message: `${result}`
-                    })
-                }
-            }
+            // console.log(message)
+
+            // @ts-ignore
+            let groupid = message.peerId.chatId.valueOf()
+            let channellink = message.message.split('\n')
+            let link = channellink[1]
+            let channel_name = link.split('/')[1]
+            let postid = link.split('/')[2]
+
+            // const messages = await client.invoke(
+            //     new Api.messages.GetMessages({
+            //         channel: channel_name,
+            //         // @ts-ignore
+            //         id: [parseFloat(postid)],
+            //     })
+            // );
+            // console.log(messages)
+
+           await client.invoke(
+                new Api.messages.ForwardMessages({
+                    fromPeer: channel_name,
+                    // @ts-ignore
+                    id: [parseFloat(postid)],
+                    toPeer: "-990629674"
+                })
+            );
+
+            // const fullUser = await client.invoke(
+                // new Api.users.GetFullUser({
+                    // id: userId,
+                // })
+            // );
+
+            // console.log(fullUser)
+
+            await client.invoke(
+                new Api.messages.SendMessage({
+                    peer: "-990629674",
+                    // @ts-ignore
+                    // message: message.message + `\n\n` + message.media.webpage.description + `\n\nотправлено с @${channel_name}\n`,
+                    message: link,
+                    noWebpage: true
+                })
+            )
+
+
+            // console.log(message)
         }
+
+
     }
 
     // adds an event handler for new messages
